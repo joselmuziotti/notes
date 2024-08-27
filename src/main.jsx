@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import axios from 'axios'
+import "./index.css"
 
 //opcion 1
 // const promise = axios.get('http://localhost:3001/notes')

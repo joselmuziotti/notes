@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import Note from "./components/Note";
 import noteServices from "./services/notes";
+import Notification from "./components/Notification";
+import Footer from "./components/Footer";
+import Form from "./components/Form";
+import List from "./components/List";
+import Button from "./components/Button";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("a new note...");
-  const [showAll, setShowAll] = useState(true)
+  const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     noteServices
@@ -42,38 +47,31 @@ const App = () => {
   const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id)
     const changedNote = {...note, important: !note.important}
-
+  
     noteServices
     .update(id, changedNote)
     .then(returnedNote => {
       setNotes(notes.map(note => note.id !== id ? note : returnedNote))
     })
     .catch(error => {
-      alert(
-        `the note '${note.content}' was already deleted from server`
+      setErrorMessage(
+        `Note '${note.content}' was already removed from server`
       )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
       setNotes(notes.filter(n => n.id !== id))
     })
   }
-  
 
   return (
     <div>
       <h1>Notes</h1>
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all' }
-        </button>
-      </div>
-      <ul>
-        {noteToShow.map((note) => (
-          <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)} />
-        ))}
-      </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange}/>
-        <button type="submit">save</button>
-      </form>
+      <Notification message={errorMessage} />
+      <Button text='show' setShowAll={setShowAll} showAll={showAll} />
+      <List noteToShow={noteToShow} toggleImportanceOf={toggleImportanceOf} />
+      <Form addNote={addNote} newNote={newNote} handleNoteChange={handleNoteChange} />
+      <Footer />
     </div>
   );
 };
